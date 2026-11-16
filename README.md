@@ -10,7 +10,7 @@ inc/hello1.h  # спільний заголовок (ccflags-y += -I$(src)/inc)
 
 ## Збірка
 ```
-make KDIR=$HOME/repos/linux-stable   # крос-збірка ARM (BeagleBone), як у лабі 4
+make KDIR=$HOME/repos/linux-stable   # крос-збірка ARM (ядро 4.19.325, як у лабі 4)
 modinfo hello1.ko
 modinfo hello2.ko
 ```
@@ -25,23 +25,23 @@ modinfo hello2.ko
 
 ## Запуск (п. IV)
 ```
-sudo insmod hello1.ko
-sudo insmod hello2.ko count=0   ; sudo rmmod hello2     # warn
-sudo insmod hello2.ko count=3   ; sudo rmmod hello2     # info
-sudo insmod hello2.ko count=7   ; sudo rmmod hello2     # warn + info
-sudo insmod hello2.ko count=11                          # err (insmod: Invalid parameters)
+insmod hello1.ko
+insmod hello2.ko count=0   ; rmmod hello2     # warn
+insmod hello2.ko count=3   ; rmmod hello2     # info
+insmod hello2.ko count=7   ; rmmod hello2     # warn + info
+insmod hello2.ko count=11                          # err (insmod: can't insert 'hello2.ko': invalid parameter)
 cat /sys/module/hello2/parameters/count                 # значення параметра
-sudo rmmod hello1                                       # друк часу кожного виклику
-sudo dmesg | grep -E "hello|Hello"
-sudo dmesg --level=err,warn
+rmmod hello1                                       # друк часу кожного виклику
+dmesg | grep -E "hello|Hello"
+dmesg --level=err,warn
 ```
 
 ## П. V — hello2.ko без hello1.ko
 ```
-sudo rmmod hello2 hello1   # якщо завантажені
-sudo insmod hello2.ko
-# insmod: ERROR: could not insert module hello2.ko: Unknown symbol in module
-sudo dmesg | tail
+rmmod hello2 hello1   # якщо завантажені
+insmod hello2.ko
+# insmod: can't insert 'hello2.ko': unknown symbol in module or invalid parameter
+dmesg | tail
 # hello2: Unknown symbol print_hello (err -2)
 ```
 **Пояснення:** `hello2` використовує функцію `print_hello()`, яку експортує
